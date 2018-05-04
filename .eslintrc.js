@@ -5,12 +5,17 @@ module.exports = {
     browser: true,
     node: true
   },
-  extends: 'standard',
+  extends: ['eslint:recommended', 'prettier'],
   // required to lint *.vue files
-  plugins: [
-    'html'
-  ],
+  plugins: ['html'],
   // add your custom rules here
-  rules: {},
+  rules: {
+    'no-unused-vars': [
+      'warn',
+      { vars: 'all', args: 'after-used', ignoreRestSiblings: false }
+    ],
+    'no-console': ['warn']
+  },
+
   globals: {}
 }
