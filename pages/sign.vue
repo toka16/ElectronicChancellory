@@ -1,50 +1,100 @@
 <template>
   <div>
-    <v-text-field textarea label="Text" :error="!valid" v-model="text" required></v-text-field>
-    <p>{{sigValueHex}}</p>
-    <v-btn type="button" @click="signData">Sign</v-btn>
-    <v-btn type="button" @click="validateData">Validate</v-btn>
+    <div>
+      <v-text-field textarea label="Text" :error="!valid" v-model="text" required></v-text-field>
+
+      <v-btn type="button" @click="signData" :disabled="!prvKey">Sign</v-btn>
+      <v-btn type="button" @click="validateData" :disabled="!pubKey">Validate</v-btn>
+
+      <p>{{sigValueHex}}</p>
+
+    </div>
+    <v-divider></v-divider>
+    <div>
+      <v-btn type="button" @click="generateKeys">Generate New Key Pair</v-btn>
+      <v-btn type="button" @click="loadKeys">Load Keys</v-btn>
+      <v-btn type="button" @click="saveKeyInFile">Save Keys in file</v-btn>
+      <upload-button title="Load Keys from file" :selectedCallback="loadKeyFromFile"></upload-button>
+
+      <v-checkbox v-model="saveInBrawser" label="Save in brawser" />
+
+      <p>{{prvKey}}</p>
+      <p>{{pubKey}}</p>
+
+    </div>
   </div>
 </template>
 
 <script>
-import r from "jsrsasign";
+import { generatePair } from "../utils/key-utils";
+import { Signer, Validator } from "../utils/sign-utils";
 
+import UploadButton from "../components/UploadButton";
+
+let textFile = null;
 export default {
   layout: "vuetify",
   data: () => ({
     text: "",
     sigValueHex: "",
-    valid: true
+    valid: true,
+    prvKey: "",
+    pubKey: "",
+    saveInBrawser: true
   }),
   methods: {
-    getPrvKey() {
-      return r.KEYUTIL.getKey(localStorage["prvKey"]);
+    generateKeys() {
+      const pair = generatePair();
+
+      localStorage["prvKey"] = pair.prvKey;
+      localStorage["pubKey"] = pair.pubKey;
     },
-    getPubKey() {
-      return r.KEYUTIL.getKey(localStorage["pubKey"]);
+    loadKeys() {
+      this.prvKey = localStorage["prvKey"];
+      this.pubKey = localStorage["pubKey"];
     },
-    createSigner() {
-      var sig = new r.KJUR.crypto.Signature({ alg: "SHA1withRSA" });
-      sig.init(this.getPrvKey());
-      return sig;
-    },
-    createValidator() {
-      var sig = new r.KJUR.crypto.Signature({ alg: "SHA1withRSA" });
-      sig.init(this.getPubKey());
-      return sig;
-    },
+
     signData() {
-      const sig = this.createSigner();
-      sig.updateString(this.text);
-      this.sigValueHex = sig.sign();
-      this.valid = true;
+      const sig = new Signer(this.prvKey);
+      this.sigValueHex = sig.signText(this.text);
     },
+
     validateData() {
-      const validator = this.createValidator();
-      validator.updateString(this.text);
-      this.valid = validator.verify(this.sigValueHex);
+      const val = new Validator(this.pubKey);
+      const valid = val.validateText(this.text, this.sigValueHex);
+      console.log(valid);
+    },
+
+    saveKeyInFile() {
+      var data = new Blob([this.prvKey], { type: "text/plain" });
+
+      if (textFile !== null) {
+        window.URL.revokeObjectURL(textFile);
+      }
+
+      textFile = window.URL.createObjectURL(data);
+
+      var link = document.createElement("a");
+      link.setAttribute("download", "prvKey-pem.txt");
+      link.href = textFile;
+      document.body.appendChild(link);
+
+      // wait for the link to be added to the document
+      window.requestAnimationFrame(function() {
+        var event = new MouseEvent("click");
+        link.dispatchEvent(event);
+        document.body.removeChild(link);
+      });
+    },
+    loadKeyFromFile(file) {
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = () =>{
+        this.prvKey = reader.result;
+      };
+      reader.readAsText(file);
     }
-  }
+  },
+  components: { UploadButton }
 };
 </script>
