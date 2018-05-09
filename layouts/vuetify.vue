@@ -88,7 +88,8 @@
         fixed: false,
         items: [
           { icon: 'apps', title: 'Welcome', to: '/' },
-          { icon: 'bubble_chart', title: 'Sign', to: '/sign' }
+          { icon: 'bubble_chart', title: 'Sign', to: '/sign' },
+          { icon: 'person', title: 'Profile', to: '/profile' }
         ],
         miniVariant: false,
         right: true,

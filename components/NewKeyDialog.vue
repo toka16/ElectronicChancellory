@@ -1,0 +1,101 @@
+<template>
+    <v-dialog v-model="alive" max-width="500px">
+        <v-card>
+            <v-card-title>
+                <h3>Create New Key</h3>
+            </v-card-title>
+            <v-card-text>
+                <v-text-field label="Key Name" v-model="newKeyName" />
+
+                <v-layout row>
+                    <v-btn @click.native="saveKeyInFile" flat style="flex-grow:1">Download Key</v-btn>
+                    <v-btn @click.native="saveKeyInBrawser" style="flex-grow:1">Save In Brawser</v-btn>
+                </v-layout>
+            </v-card-text>
+            <v-divider></v-divider>
+            <v-card-actions>
+                <v-btn color="primary" flat @click.stop="alive=false">Close</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+</template>
+
+<script>
+import { generatePair } from "../utils/key-utils";
+let textFile;
+export default {
+  props: ["value"],
+  watch: {
+    alive(val) {
+      if (val) {
+        this.newKeyName = "";
+        this.generateNewKey();
+      }
+    }
+  },
+  methods: {
+    async saveKeyInServer() {
+      console.log("public key", this.pubKey);
+      return true;
+    },
+    generateNewKey() {
+      setImmediate(() => {
+        const pair = generatePair();
+        this.prvKey = pair.prvKey;
+        this.pubKey = pair.pubKey;
+      });
+    },
+    async fleshKeys(){
+        this.$emit('newKey', this.prvKey);
+        return await this.saveKeyInServer();
+    },
+    saveKeyInFile() {
+      var data = new Blob([this.prvKey], { type: "text/plain" });
+
+      if (textFile !== null) {
+        window.URL.revokeObjectURL(textFile);
+      }
+
+      textFile = window.URL.createObjectURL(data);
+
+      var link = document.createElement("a");
+      link.setAttribute("download", "prvKey-pem.txt");
+      link.href = textFile;
+      document.body.appendChild(link);
+
+      // wait for the link to be added to the document
+      window.requestAnimationFrame(() => {
+        var event = new MouseEvent("click");
+        link.dispatchEvent(event);
+        document.body.removeChild(link);
+
+        this.fleshKeys();
+      });
+    },
+    async saveKeyInBrawser() {
+      await this.fleshKeys();
+      localStorage["_chancellory_key_"] = this.prvKey;
+    }
+  },
+  computed: {
+    alive: {
+      get() {
+        return this.value;
+      },
+      set(val) {
+        this.$emit("input", val);
+      }
+    }
+  },
+  data: () => ({
+    newKeyName: "",
+    prvKey: null,
+    pubKey: null,
+    keySaved: false
+  })
+};
+</script>
+
+<style>
+
+</style>
