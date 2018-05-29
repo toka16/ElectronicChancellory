@@ -89,7 +89,8 @@
         items: [
           { icon: 'apps', title: 'Welcome', to: '/' },
           { icon: 'bubble_chart', title: 'Sign', to: '/sign' },
-          { icon: 'person', title: 'Profile', to: '/profile' }
+          { icon: 'person', title: 'Profile', to: '/profile' },
+          { icon: 'edit', title: 'Create New Document', to: '/new-document' }
         ],
         miniVariant: false,
         right: true,

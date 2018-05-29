@@ -44,10 +44,17 @@ export default {
   }),
   methods: {
     generateKeys() {
-      const pair = generatePair();
+      generatePair().then(pair => {
+        console.log("pair: ", pair);
+        localStorage["prvKey"] = pair.prvKey;
+        localStorage["pubKey"] = pair.pubKey;
+      }).catch((e)=>{
+        console.error(e);
+      })
+      // const pair = generatePair();
 
-      localStorage["prvKey"] = pair.prvKey;
-      localStorage["pubKey"] = pair.pubKey;
+      // localStorage["prvKey"] = pair.prvKey;
+      // localStorage["pubKey"] = pair.pubKey;
     },
     loadKeys() {
       this.prvKey = localStorage["prvKey"];
@@ -89,7 +96,7 @@ export default {
     loadKeyFromFile(file) {
       if (!file) return;
       var reader = new FileReader();
-      reader.onload = () =>{
+      reader.onload = () => {
         this.prvKey = reader.result;
       };
       reader.readAsText(file);
