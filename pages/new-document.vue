@@ -1,32 +1,38 @@
 <template>
-    <v-layout column>
-        <v-text-field textarea label="Text" v-model="text" required></v-text-field>
-        <no-ssr>
-            <load-key v-on:key="updateKey" />
-        </no-ssr>
-        <v-btn type="button" @click="signData" :disabled="!prvKey">Sign</v-btn>
-    </v-layout>
+  <v-layout column>
+    <v-alert :value="documentSuccess" type="success">
+      Document is created successfully
+    </v-alert>
+    <form @submit.prevent="submit">
+      <v-text0field label="Title" v-model="title" required></v-text0field>
+      <v-text-field textarea label="Text" v-model="text" required></v-text-field>
+      <v-btn type="submit" :disabled="!text">Submit</v-btn>
+    </form>
+  </v-layout>
 </template>
 
 <script>
-import LoadKey from "../components/LoadKey";
-
 export default {
   layout: "vuetify",
   data: () => ({
+    title: "",
     text: "",
-    prvKey: null
+    documentSuccess: false
   }),
   methods: {
-    signData() {},
-    updateKey(key) {
-      this.prvKey = key;
+    submit() {
+      this.$axios
+        .post("/api/docs", {
+          title: this.title,
+          text: this.text
+        })
+        .then(res => {
+          this.$router.push(`/documents/${res.data.id}`);
+        })
+        .catch(res => {
+          alert(res.response.data);
+        });
     }
-  },
-  components: { LoadKey }
+  }
 };
 </script>
-
-<style>
-
-</style>

@@ -5,8 +5,6 @@
         <h3>Create New Key</h3>
       </v-card-title>
       <v-card-text>
-        <v-text-field label="Key Name" v-model="newKeyName" />
-
         <v-layout row>
           <v-alert :value="true" :type="isLoading?'info':'success'" style="flex-grow:1">
             {{isLoading?'Your Key Pair is being generated...':'Your Key Pair is created, save or download it from below'}}
@@ -36,15 +34,16 @@ export default {
   watch: {
     alive(val) {
       if (val) {
-        this.newKeyName = "";
         this.generateNewKey();
       }
     }
   },
   methods: {
     async saveKeyInServer() {
-      console.log("public key", this.pubKey);
-      return true;
+
+      await this.$axios.post('/api/keys', {
+        key: this.pubKey
+      })
     },
     generateNewKey() {
       this.isLoading = true;
@@ -57,8 +56,8 @@ export default {
       });
     },
     async fleshKeys() {
+      await this.saveKeyInServer();
       this.$emit("newKey", this.prvKey);
-      return await this.saveKeyInServer();
     },
     saveKeyInFile() {
       var data = new Blob([this.prvKey], { type: "text/plain" });
@@ -99,7 +98,6 @@ export default {
     }
   },
   data: () => ({
-    newKeyName: "",
     prvKey: null,
     pubKey: null,
     keySaved: false,

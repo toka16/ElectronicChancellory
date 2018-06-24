@@ -24,6 +24,30 @@ module.exports = {
   css: ['~/assets/css/main.css', '~/assets/style/app.styl'],
 
   plugins: ['~/plugins/vuetify'],
+
+  modules: [
+    '@nuxtjs/axios',
+    '@nuxtjs/auth'
+  ],
+
+  auth: {
+    redirect: {
+      home: '/'
+    },
+    strategies: {
+      local: {
+        endpoints: {
+          login: { url: '/api/auth/login', method: 'post', propertyName: 'token' },
+          logout: { url: '/api/auth/logout', method: 'post' },
+          user: { url: '/api/auth/user', method: 'get', propertyName: 'user' }
+        },
+      }
+    }
+  },
+
+  router: {
+    middleware: ['auth']
+  },
   /*
   ** Add axios globally
   */

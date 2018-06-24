@@ -48,9 +48,9 @@
       <v-spacer></v-spacer>
       <v-btn
         icon
-        @click.stop="rightDrawer = !rightDrawer"
+        @click="logout"
       >
-        <v-icon>menu</v-icon>
+        <v-icon>exit_to_app</v-icon>
       </v-btn>
     </v-toolbar>
     <v-content>
@@ -90,12 +90,20 @@
           { icon: 'apps', title: 'Welcome', to: '/' },
           { icon: 'bubble_chart', title: 'Sign', to: '/sign' },
           { icon: 'person', title: 'Profile', to: '/profile' },
+          { icon: 'person', title: 'Documents', to: '/documents' },
           { icon: 'edit', title: 'Create New Document', to: '/new-document' }
         ],
         miniVariant: false,
         right: true,
         rightDrawer: false,
         title: 'Vuetify.js'
+      }
+    },
+    methods: {
+      logout(){
+        this.$auth.logout().then(()=>{
+          this.$router.push('/login');
+        });
       }
     }
   }

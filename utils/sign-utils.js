@@ -1,39 +1,20 @@
-import r from "jsrsasign";
+import {
+  call
+} from './worker-helper'
 
 const signatureAlgorithm = "SHA1withRSA";
 
-export class Signer {
-  constructor(prvKey) {
-    this.prvKey = prvKey;
-  }
-
-  createSigner() {
-    var sig = new r.KJUR.crypto.Signature({ alg: signatureAlgorithm });
-    sig.init(this.prvKey);
-    return sig;
-  }
-
-  signText(text) {
-    const sig = this.createSigner();
-    sig.updateString(text);
-    return sig.sign();
-  }
+export const sign = (key, data)=>{
+  return call('signData', [signatureAlgorithm, key, data]);
 }
 
-export class Validator {
-  constructor(pubKey) {
-    this.pubKey = pubKey;
-  }
+export const validate = (key, data, signature) => {
+  return call('verifyData', [signatureAlgorithm, key, data, signature]);
+}
 
-  createValidator() {
-    var sig = new r.KJUR.crypto.Signature({ alg: signatureAlgorithm });
-    sig.init(this.pubKey);
-    return sig;
-  }
-
-  validateText(text, signature) {
-    const sig = this.createValidator();
-    sig.updateString(text);
-    return sig.verify(signature);
+export const validateWithMultipleKey = async (keys, data, signature) => {
+  for (let key of keys){
+    const res = await validate(key.pub_key, data, signature);
+    if (res) return res;
   }
 }

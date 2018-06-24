@@ -29,6 +29,23 @@ var worker = {
             pubKey: KEYUTIL.getPEM(pair.pubKeyObj)
         };
     },
+    signData: function(algorithm, prvKey, data){
+        var sig = new KJUR.crypto.Signature({
+            alg: algorithm
+        });
+        sig.init(prvKey);
+        sig.updateString(data.toString());
+        return sig.sign();
+    },
+
+    verifyData: function(algorithm, pubKey, data, signature){
+        var sig = new KJUR.crypto.Signature({
+            alg: algorithm
+        });
+        sig.init(pubKey);
+        sig.updateString(data.toString());
+        return sig.verify(signature);
+    },
 
     successFunc: function(a, b){
         return {a: a, b: b};
