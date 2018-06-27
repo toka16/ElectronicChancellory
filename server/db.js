@@ -69,6 +69,14 @@ export const findKeys = (params) => {
     return query(`SELECT * from RSA_Keys where owner_id = ? and created_at < ?`, [params.owner_id, new Date(params.created_at)]);
 }
 
+export const getComments = (docId) => {
+    return query(`SELECT * from comments_view where document_id = ?`, docId);
+}
+
+export const saveComment = (comment) => {
+    return insert('Comments', comment);
+}
+
 
 function insert(table, item) {
     return query(`INSERT INTO ${table} SET ?`, item)

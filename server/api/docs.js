@@ -8,7 +8,9 @@ import {
     saveDoc,
     getDoc,
     signDoc,
-    getAllDocs
+    getAllDocs,
+    getComments,
+    saveComment
 } from '../db'
 
 const router = Router()
@@ -58,5 +60,30 @@ router.post('/:id/sign', requireScope(['operator', 'admin']), (req, res)=>{
         res.status(500).send(err);
     });
 });
+
+
+router.get("/:id/comments", requireScope(['operator', 'admin']), (req, res)=>{
+    getComments(req.params.id).then(comments=>{
+        res.json(comments);
+    }).catch((err)=>{
+        res.status(500).send(err);
+    })
+});
+
+
+router.post('/:id/comments', requireScope(['operator', 'admin']), (req, res)=>{
+    const comment = {
+        author_id: req.user.id,
+        document_id: req.params.id,
+        text: req.body.text,
+        created_at: new Date()
+    }
+
+    saveComment(comment).then(()=>{
+        res.sendStatus(200);
+    }).catch((err)=>{
+        res.status(500).send(err);
+    })
+})
 
 export default router;

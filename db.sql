@@ -2,12 +2,14 @@ CREATE DATABASE IF NOT EXISTS el_chancellory;
 use el_chancellory;
 
 
+drop table if exists Comments;
 drop table if exists RSA_Keys;
 drop table if exists Signatures;
 drop table if exists Docs;
 drop table if exists Users;
 drop view if exists docs_view;
 drop view if exists signatures_view;
+drop view if exists comments_view;
 
 
 CREATE TABLE Users (
@@ -50,10 +52,27 @@ CREATE TABLE Signatures (
     user_id int not null,
     signature text not null,
     created_at datetime,
+    INDEX signatures_document_id_ind (document_id),
     FOREIGN KEY (document_id)
         REFERENCES Docs(id)
         ON DELETE CASCADE,
 	FOREIGN KEY (user_id)
+        REFERENCES Users(id)
+        ON DELETE CASCADE
+);
+
+
+CREATE TABLE Comments (
+	id int not null auto_increment primary key,
+    author_id int not null,
+    document_id int not null,
+    `text` text not null,
+    created_at datetime,
+    INDEX comments_document_id_ind (document_id),
+    FOREIGN KEY (document_id)
+        REFERENCES Docs(id)
+        ON DELETE CASCADE,
+	FOREIGN KEY (author_id)
         REFERENCES Users(id)
         ON DELETE CASCADE
 );
@@ -70,6 +89,11 @@ CREATE VIEW docs_view as
 		from Docs
         join Users as author on author.id = Docs.author_id
         left join signatures_view as sign on sign.document_id = Docs.id;
+        
+CREATE VIEW comments_view as
+	select Comments.*, concat(Users.first_name, ' ', Users.last_name) as author 
+		from Comments
+        join Users on Comments.author_id = Users.id
       
         
 
