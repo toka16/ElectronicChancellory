@@ -84,7 +84,7 @@ export default {
     },
     async saveKeyInBrawser() {
       await this.fleshKeys();
-      localStorage["_chancellory_key_"] = this.prvKey;
+      localStorage["_chancellory_key_"+this.$auth.user.id+"_"] = this.prvKey;
     }
   },
   computed: {

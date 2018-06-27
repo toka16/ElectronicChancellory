@@ -81,7 +81,12 @@ export default {
   },
   methods: {
     async sign() {
-      const signature = await sign(this.prvKey, this.text);
+      const signature = await sign(this.prvKey, {
+        title: this.document.title,
+        text: this.document.text,
+        created_at: this.document.created_at,
+        author_id: this.document.author_id
+      });
       await this.$axios
         .post(`/api/docs/${this.document.id}/sign`, {
           signature
@@ -102,8 +107,13 @@ export default {
       });
       const res = await validateWithMultipleKey(
         keys,
-        this.text,
-        this.signature
+        {
+          title: this.document.title,
+          text: this.document.text,
+          created_at: this.document.created_at,
+          author_id: this.document.author_id
+        },
+        this.document.signature
       );
       this.signStatus = res ? "success" : "error";
     },

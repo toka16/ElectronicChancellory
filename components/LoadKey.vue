@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-alert :type="keyType" :value="true">
-            <h3 v-if="!!prvKey">Key is loaded</h3>
+            <h3 v-if="!!prvKey">Key is loaded. <upload-button class="pr-2 pl-2" title="Load another key from file" :selectedCallback="loadKeyFromFile"></upload-button></h3>
             <h3 v-else>You don't have key in brawser. Load it from
                 <upload-button title="file" :selectedCallback="loadKeyFromFile"></upload-button> or create
                 <v-btn @click.native="createNewOne">new one</v-btn>
@@ -17,7 +17,7 @@ import NewKeyDialog from "./NewKeyDialog";
 
 export default {
   created() {
-    this.prvKey = localStorage["_chancellory_key_"];
+    this.prvKey = localStorage["_chancellory_key_"+this.$auth.user.id+"_"];
   },
   data: () => ({
     prvKey: null,
