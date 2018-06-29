@@ -16,7 +16,7 @@ CREATE TABLE Users (
 	id int not null auto_increment primary key,
 	first_name varchar(100) NOT NULL,
 	last_name varchar(100) NOT NULL,
-	email varchar(100) NOT NULL,
+	email varchar(100) NOT NULL unique,
 	password varchar(255) NOT NULL,
     scope varchar(100) NOT NULL,
     INDEX user_email_ind (email)

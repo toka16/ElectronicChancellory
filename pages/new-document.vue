@@ -4,8 +4,8 @@
       Document is created successfully
     </v-alert>
     <form @submit.prevent="submit">
-      <v-text0field label="Title" v-model="title" required></v-text0field>
-      <v-text-field textarea label="Text" v-model="text" required></v-text-field>
+      <v-text-field label="Title" v-model="title" required></v-text-field>
+      <v-text-field multi-line label="Text" v-model="text" required></v-text-field>
       <v-btn type="submit" :disabled="!text">Submit</v-btn>
     </form>
   </v-layout>

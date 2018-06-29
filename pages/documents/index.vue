@@ -38,7 +38,6 @@ export default {
     };
   },
   data() {
-    window.t = this;
     return {
       headers: [
         {

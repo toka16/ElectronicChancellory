@@ -31,10 +31,10 @@
 <script>
 export default {
   auth: false,
-  created(){
-      if (this.$auth.loggedIn){
-          this.$router.push(this.$store.$auth.options.redirect.home);
-      }
+  created() {
+    if (this.$auth.loggedIn) {
+      this.$router.push(this.$store.$auth.options.redirect.home);
+    }
   },
   data() {
     return {
@@ -54,7 +54,7 @@ export default {
   },
   methods: {
     submit() {
-      window.ax = this.$axios;
+      if (!this.$refs.form.validate()) return;
       this.$auth
         .loginWith("local", {
           data: {
@@ -63,7 +63,7 @@ export default {
           }
         })
         .then(() => {
-            this.$router.push(this.$store.$auth.options.redirect.home);
+          this.$router.push(this.$store.$auth.options.redirect.home);
         })
         .catch(error => {
           this.error = error.response.data.error;

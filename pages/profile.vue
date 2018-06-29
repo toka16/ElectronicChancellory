@@ -1,29 +1,22 @@
 <template>
     <v-container fluid column>
         <v-toolbar color="pink">
-            <v-toolbar-title class="white--text">Signature Keys</v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-btn icon @click="newKeyDialog=true">
-                <v-icon>add</v-icon>
-            </v-btn>
+            <v-toolbar-title class="white--text">My Profile</v-toolbar-title>
         </v-toolbar>
         <v-card>
-            <v-data-table :headers="headers" :items="items" v-model='selected' select-all item-key="name">
-                <template slot='items' slot-scope='props'>
-                    <td>
-                        <v-checkbox primary hide-details v-model="props.selected"></v-checkbox>
-                    </td>
-                    <td>{{props.item.name}}</td>
-                    <td>{{props.item.date}}</td>
-                    <td>
-                        <v-btn icon>
-                            <v-icon>delete</v-icon>
-                        </v-btn>
-                    </td>
-                </template>
-            </v-data-table>
+            <v-form class="pl-3">
+                <v-text-field label="E-mail address" v-model="$auth.user.email" disabled></v-text-field>
+                <v-text-field label="First name" v-model="$auth.user.first_name" disabled></v-text-field>
+                <v-text-field label="Last name" v-model="$auth.user.last_name" disabled></v-text-field>
+                <v-text-field label="Scope" v-model="$auth.user.scope" disabled></v-text-field>
+            </v-form>
         </v-card>
-        <new-key-dialog v-model="newKeyDialog"></new-key-dialog>
+        <new-key-dialog v-model="newKeyDialog" v-on:newKey="updateKey"></new-key-dialog>
+        <v-toolbar color="pink" v-if="$auth.user.scope === 'operator'">
+            <v-toolbar-title class="white--text">{{keyTitle}}</v-toolbar-title>
+            <v-spacer />
+            <v-btn @click="newKeyDialog=true">Add new key</v-btn>
+        </v-toolbar>
     </v-container>
 </template>
 
@@ -31,38 +24,26 @@
 import NewKeyDialog from "../components/NewKeyDialog";
 export default {
   layout: "vuetify",
-  data: () => ({
-    newKeyDialog: false,
-    selected: [],
-    headers: [
-      {
-        text: "Name",
-        value: "name"
-      },
-      {
-        text: "Date",
-        value: "date"
-      },
-      {
-        text: "Delete",
-        sortable: false
+  data(){
+      console.log(this)
+      return {
+          newKeyDialog: false,
+          keyExists: this.$isServer ? false : !!localStorage["_chancellory_key_"+this.$auth.user.id+"_"]
       }
-    ],
-    items: [
-      {
-        name: "My first Key",
-        date: new Date()
-      },
-      {
-        name: "Other key",
-        date: new Date("08/05/2016")
+  },
+  computed: {
+      keyTitle(){
+          return this.keyExists ? "You already have key" : "You don't have key"
       }
-    ]
-  }),
+  },
+  methods: {
+      updateKey(){
+          this.keyExists = true
+      }
+  },
   components: { NewKeyDialog }
 };
 </script>
 
 <style>
-
 </style>

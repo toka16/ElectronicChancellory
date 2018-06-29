@@ -3,11 +3,11 @@ import Vuex from 'vuex'
 const createStore = () => {
     return new Vuex.Store({
         state: {
-            counter: 0
+            title: "Wellcome"
         },
         mutations: {
-            increment(state) {
-                state.counter++
+            setTitle(state, title) {
+                state.title = title
             }
         }
     })

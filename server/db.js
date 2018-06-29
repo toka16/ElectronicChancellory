@@ -77,6 +77,13 @@ export const saveComment = (comment) => {
     return insert('Comments', comment);
 }
 
+export const getUsers = ()=>{
+    return query('SELECT * from Users');
+}
+
+export const saveUser = (user)=>{
+    return insert('Users', user);
+}
 
 function insert(table, item) {
     return query(`INSERT INTO ${table} SET ?`, item)

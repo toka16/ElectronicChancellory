@@ -4,7 +4,8 @@ import {
 
 import requireScope from '../requireScope'
 import {
-    login
+    login,
+    saveUser,
 } from '../db'
 import {
     sign,
@@ -32,14 +33,19 @@ router.post('/login', function (req, res, next) {
         });
     })
 })
-router.post('/logout', (req, res)=>{res.sendStatus(200)});
+router.post('/logout', (req, res) => {
+    res.sendStatus(200)
+});
 
 router.get('/user', requireScope(), (req, res, next) => {
-    if (req.user){
-        res.json({user: req.user})
-    }else{
+    if (req.user) {
+        res.json({
+            user: req.user
+        })
+    } else {
         req.sendStatus(500);
     }
 })
+
 
 export default router;

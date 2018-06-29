@@ -46,7 +46,7 @@ module.exports = {
   },
 
   router: {
-    middleware: ['auth']
+    middleware: ['auth', 'router']
   },
   /*
   ** Add axios globally

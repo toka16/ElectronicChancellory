@@ -1,27 +1,46 @@
 import { Router } from 'express'
 
+import requireScope from '../requireScope'
+import {
+  getUsers,
+  saveUser,
+} from '../db'
+
 const router = Router()
 
-// Mock Users
-const users = [
-  { name: 'Alexandre' },
-  { name: 'Pooya' },
-  { name: 'Sébastien' },
-]
-
-/* GET users listing. */
-router.get('/users', function (req, res, next) {
-  res.json(users)
+router.get('/users', function (req, res) {
+  getUsers().then((users)=>{
+    res.json(users);
+  }).catch(err=>{
+    res.status(500).send(err);
+  })
 })
 
-/* GET user by ID. */
-router.get('/users/:id', function (req, res, next) {
-  const id = parseInt(req.params.id)
-  if (id >= 0 && id < users.length) {
-    res.json(users[id])
-  } else {
-    res.sendStatus(404)
-  }
+router.post('/register', requireScope(['admin']), (req, res) => {
+  const {
+    first_name,
+    last_name,
+    email,
+    password,
+    scope
+  } = req.body;
+  const user = {
+    first_name,
+    last_name,
+    email,
+    password,
+    scope
+  };
+  saveUser(user).then(() => {
+    res.sendStatus(200);
+  }).catch((err) => {
+    if (err.errno === 1062) { // duplicate entry
+      return res.status(400).json({
+        error: "This email is already registered"
+      })
+    }
+    res.status(500).send(err);
+  })
 })
 
 export default router
