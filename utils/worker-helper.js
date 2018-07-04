@@ -4,7 +4,7 @@ if (process.browser) {
     w = new Worker("/worker.js");
 
     w.onmessage = (e) => {
-        console.log('onmessage', e);
+        console.log('onmessage', e); //eslint-disable-line
         if (e.data && e.data.key && calls[e.data.key]) {
             calls[e.data.key](e.data);
         }

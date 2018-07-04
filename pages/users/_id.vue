@@ -1,6 +1,6 @@
 <template>
     <v-container fluid column>
-        <profile :title="title" :user="user" />
+        <profile :title="title" :user="user" :editable="true" />
     </v-container>
 </template>
 

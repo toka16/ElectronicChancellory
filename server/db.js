@@ -94,7 +94,7 @@ export const saveUser = (user)=>{
 }
 
 export const updateUser = (user)=>{
-    return query(`UPDATE Users SET first_name=?,last_name=?,email=? WHERE id=?`, [user.first_name, user.last_name, user.email, user.id])
+    return query(`UPDATE Users SET first_name=?,last_name=?,email=?,password=? WHERE id=?`, [user.first_name, user.last_name, user.email,user.password, user.id])
 }
 
 function insert(table, item) {

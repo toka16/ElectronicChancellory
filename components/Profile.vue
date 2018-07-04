@@ -3,7 +3,7 @@
         <v-toolbar color="pink">
             <v-toolbar-title class="white--text">{{title}}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon @click="edit">
+            <v-btn v-if="editable" icon @click="edit">
                 <v-icon>edit</v-icon>
             </v-btn>
         </v-toolbar>
@@ -12,6 +12,7 @@
                 <v-text-field label="E-mail address" v-model="user.email" :disabled="!editing" required></v-text-field>
                 <v-text-field label="First name" v-model="user.first_name" :disabled="!editing" required></v-text-field>
                 <v-text-field label="Last name" v-model="user.last_name" :disabled="!editing" required></v-text-field>
+                <v-text-field label="Password" v-model="user.password" :disabled="!editing" required></v-text-field>
                 <v-text-field label="Scope" v-model="user.scope" disabled></v-text-field>
                 <v-btn type="submit" color="info" v-if="editing">Update</v-btn>
             </v-form>
@@ -21,7 +22,7 @@
 
 <script>
 export default {
-  props: ["title", "user"],
+  props: ["title", "user", "editable"],
   data(){
       return {
           editing: false

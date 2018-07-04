@@ -4,17 +4,15 @@ import {
 
 import requireScope from '../requireScope'
 import {
-    login,
-    saveUser,
+    login
 } from '../db'
 import {
     sign,
-    verify
 } from '../jwt'
 
 const router = Router()
 
-router.post('/login', function (req, res, next) {
+router.post('/login', function (req, res) {
     login(req.body).then(({
         password,
         ...user
@@ -37,7 +35,7 @@ router.post('/logout', (req, res) => {
     res.sendStatus(200)
 });
 
-router.get('/user', requireScope(), (req, res, next) => {
+router.get('/user', requireScope(), (req, res) => {
     if (req.user) {
         res.json({
             user: req.user
