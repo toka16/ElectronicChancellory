@@ -1,6 +1,6 @@
 /*eslint no-undef:*/
 var window = {}; //eslint-disable-line
-importScripts('https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/8.0.12/jsrsasign-all-min.js');
+importScripts('vendor/jsrsasign.min.js');
 
 self.onmessage = function (e) {
     console.log('in worker:', e); //eslint-disable-line
