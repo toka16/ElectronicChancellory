@@ -9,29 +9,51 @@ import {
     getDoc,
     signDoc,
     getAllDocs,
+    getUserDocs,
+    getUserSignedDocs,
+    getUnsignedDocs,
     getComments,
     saveComment
 } from '../db'
 
 const router = Router()
 
-router.get('/', (req, res)=>{
-    getAllDocs().then(docs=>{
+router.get('/', requireScope(["operator", "user"]), (req, res) => {
+    let group = req.query.group || "signed-by-me"
+    let docGetter
+    switch (req.user.scope) {
+        case "operator":
+            switch (group) {
+                case "all":
+                    docGetter = () => getAllDocs()
+                    break
+                case "signed-by-me":
+                    docGetter = () => getUserSignedDocs(req.user.id)
+                    break
+                case "unsigned":
+                    docGetter = () => getUnsignedDocs()
+                    break
+            }
+            break
+        case "user":
+            docGetter = () => getUserDocs(req.user.id)
+    }
+    docGetter().then(docs => {
         res.json(docs);
-    }).catch(err=>{
+    }).catch(err => {
         res.status(500).send(err);
     })
 })
 
-router.get('/:id', (req, res)=>{
-    getDoc(req.params.id).then(doc=>{
+router.get('/:id', requireScope(["operator", "user"]), (req, res) => {
+    getDoc(req.params.id).then(doc => {
         res.json(doc);
-    }).catch(err=>{
+    }).catch(err => {
         res.status(500).send(err);
     })
 })
 
-router.post('/', requireScope(['operator', 'admin']), (req, res) => {
+router.post('/', requireScope(['user']), (req, res) => {
     const doc = {
         title: req.body.title,
         text: req.body.text,
@@ -42,12 +64,12 @@ router.post('/', requireScope(['operator', 'admin']), (req, res) => {
         res.json({
             id: result.insertId
         });
-    }).catch((err)=>{
+    }).catch((err) => {
         res.status(500).send(err);
     })
 })
 
-router.post('/:id/sign', requireScope(['operator', 'admin']), (req, res)=>{
+router.post('/:id/sign', requireScope(['operator']), (req, res) => {
     const signature = {
         user_id: req.user.id,
         document_id: req.params.id,
@@ -62,16 +84,16 @@ router.post('/:id/sign', requireScope(['operator', 'admin']), (req, res)=>{
 });
 
 
-router.get("/:id/comments", requireScope(['operator', 'admin']), (req, res)=>{
-    getComments(req.params.id).then(comments=>{
+router.get("/:id/comments", requireScope(['operator', 'user']), (req, res) => {
+    getComments(req.params.id).then(comments => {
         res.json(comments);
-    }).catch((err)=>{
+    }).catch((err) => {
         res.status(500).send(err);
     })
 });
 
 
-router.post('/:id/comments', requireScope(['operator', 'admin']), (req, res)=>{
+router.post('/:id/comments', requireScope(['operator', 'user']), (req, res) => {
     const comment = {
         author_id: req.user.id,
         document_id: req.params.id,
@@ -79,9 +101,9 @@ router.post('/:id/comments', requireScope(['operator', 'admin']), (req, res)=>{
         created_at: new Date()
     }
 
-    saveComment(comment).then(()=>{
+    saveComment(comment).then(() => {
         res.sendStatus(200);
-    }).catch((err)=>{
+    }).catch((err) => {
         res.status(500).send(err);
     })
 })

@@ -3,15 +3,34 @@ import { Router } from 'express'
 import requireScope from '../requireScope'
 import {
   getUsers,
+  getUser,
   saveUser,
+  updateUser
 } from '../db'
 
 const router = Router()
 
-router.get('/users', function (req, res) {
+router.get('/users', requireScope(["admin"]), function (req, res) {
   getUsers().then((users)=>{
     res.json(users);
   }).catch(err=>{
+    res.status(500).send(err);
+  })
+})
+
+router.get('/users/:id', requireScope(["admin"]), function (req, res) {
+  getUser(req.params.id).then((users) => {
+    res.json(users);
+  }).catch(err => {
+    res.status(500).send(err);
+  })
+})
+
+router.put('/users/:id', requireScope(["admin"]), function (req, res) {
+  req.body.user.id = req.params.id
+  updateUser(req.body.user).then(() => {
+    res.sendStatus(200);
+  }).catch(err => {
     res.status(500).send(err);
   })
 })

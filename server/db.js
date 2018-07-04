@@ -50,7 +50,7 @@ export const getUserDocs = (id) => {
 }
 
 export const getUnsignedDocs = ()=>{
-    return query("SELECT * from docs_view where signature = ?", null);
+    return query("SELECT * from docs_view where signature IS NULL");
 }
 
 export const getUserSignedDocs = (id)=>{
@@ -81,8 +81,20 @@ export const getUsers = ()=>{
     return query('SELECT * from Users');
 }
 
+export const getUser = async (id) => {
+    const results = await query('SELECT * from Users where id=?', id);
+    if (results && results.length > 0) {
+        return results[0];
+    }
+    throw new Error("User not found");
+}
+
 export const saveUser = (user)=>{
     return insert('Users', user);
+}
+
+export const updateUser = (user)=>{
+    return query(`UPDATE Users SET first_name=?,last_name=?,email=? WHERE id=?`, [user.first_name, user.last_name, user.email, user.id])
 }
 
 function insert(table, item) {

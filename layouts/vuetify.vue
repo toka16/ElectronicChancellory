@@ -64,6 +64,10 @@ export default {
         });
       } else {
         items.push({
+          icon: "collections_bookmark",
+          title: "Documents",
+          to: "/documents"
+        },{
           icon: "edit",
           title: "Create New Document",
           to: "/new-document"

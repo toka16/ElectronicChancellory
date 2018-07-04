@@ -15,7 +15,7 @@
                     <td>{{props.item.last_name}}</td>
                     <td>{{props.item.scope}}</td>
                     <td>
-                        <v-btn icon :to="'/'">
+                        <v-btn icon :to="'/users/'+props.item.id">
                             <v-icon>visibility</v-icon>
                         </v-btn>
                     </td>

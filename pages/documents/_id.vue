@@ -4,10 +4,16 @@
     <h5>created at {{new Date(document.created_at).toLocaleString()}}</h5>
     <v-divider />
     <div v-if="!document.signature">
-      <no-ssr>
-        <load-key v-on:key="updateKey" />
-      </no-ssr>
-      <v-btn type="button" @click="sign" :disabled="!prvKey" color="info">Sign</v-btn>
+      {{$auth.user.scope}}
+      <template v-if="isOperator">
+        <no-ssr>
+          <load-key v-on:key="updateKey" />
+        </no-ssr>
+        <v-btn type="button" @click="sign" :disabled="!prvKey" color="info">Sign</v-btn>
+      </template>
+      <v-alert v-else :value="true" type="info">
+        This document is NOT signed yet
+      </v-alert>
     </div>
     <div v-else>
       <v-alert :value="true" :type="signStatus">
@@ -20,7 +26,7 @@
       <h2 class="text-sm-center mt-5">{{document.title}}</h2>
       <p class="mt-3">{{document.text}}</p>
       <v-divider />
-      <v-card v-for="comment in comments" class="mt-1">
+      <v-card v-for="comment in comments" :key="comment.id" class="mt-1">
         <v-card-title primary-title>
           <div>
             <h3>{{comment.author}}</h3>
@@ -32,7 +38,7 @@
       </v-card>
       <form @submit.prevent="addComment">
         <v-text-field textarea label="Write a comment..." v-model="newComment" required></v-text-field>
-        <v-btn type="submit" color="info">Submit Comment</v-btn>
+        <v-btn type="submit" color="info" :disabled="!newComment">Submit Comment</v-btn>
       </form>
     </div>
 
@@ -70,6 +76,9 @@ export default {
     };
   },
   computed: {
+    isOperator() {
+      return this.$auth.user.scope === "operator";
+    },
     author() {
       return `${this.document.first_name} ${this.document.last_name}`;
     },
@@ -95,6 +104,7 @@ export default {
           location.reload();
         })
         .catch(res => {
+          console.log(res)
           alert("error");
         });
     },
