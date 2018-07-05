@@ -19,8 +19,29 @@
       </v-btn>
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-menu bottom offset-y class="mr-3">
+        <template slot="activator">
+          <v-icon large color="grey" v-if="newNotifications.length==0">
+            info
+          </v-icon>
+          <v-badge v-else color="red">
+            <span slot="badge">{{newNotifications.length}}</span>
+            <v-icon large color="grey">
+              info
+            </v-icon>
+          </v-badge>
+        </template>
+        <template>
+          <v-list v-if="notifications.length>0">
+            <v-list-tile v-for="item in notifications" :key="item.id" :to="item.link" @click="clearNotifications(item)">
+              <v-list-tile-title :class="'black--text ' + (item.status||'info')">{{ item.text }}</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+          <div class="white" v-else>You don't have notifications</div>
+        </template>
+      </v-menu>
       <v-btn icon @click="logout">
-        <v-icon>exit_to_app</v-icon>
+        <v-icon large>exit_to_app</v-icon>
       </v-btn>
     </v-toolbar>
     <v-content>
@@ -29,7 +50,8 @@
       </v-container>
     </v-content>
     <v-footer :fixed="false" app>
-      Electronic Chancellory <span>&copy; 2018</span>
+      Electronic Chancellory
+      <span>&copy; 2018</span>
     </v-footer>
   </v-app>
 </template>
@@ -44,7 +66,13 @@ export default {
   },
   computed: {
     title() {
-      return this.$store.state.title
+      return this.$store.state.title;
+    },
+    notifications() {
+      return this.$store.state.notifications;
+    },
+    newNotifications() {
+      return this.notifications.filter(item => !item.status);
     },
     items() {
       const items = [
@@ -63,15 +91,18 @@ export default {
           to: "/documents"
         });
       } else {
-        items.push({
-          icon: "collections_bookmark",
-          title: "Documents",
-          to: "/documents"
-        },{
-          icon: "edit",
-          title: "Create New Document",
-          to: "/new-document"
-        });
+        items.push(
+          {
+            icon: "collections_bookmark",
+            title: "Documents",
+            to: "/documents"
+          },
+          {
+            icon: "edit",
+            title: "Create New Document",
+            to: "/new-document"
+          }
+        );
       }
       return items;
     }
@@ -81,6 +112,14 @@ export default {
       this.$auth.logout().then(() => {
         this.$router.push("/login");
       });
+    },
+    clearNotifications(item){
+      console.log(item)
+      this.$axios.put(`/api/notifications/${item.id}/seen`).then(()=>{
+        item.status = 1
+      }).catch(err=>{
+        console.log(err)
+      })
     }
   }
 };

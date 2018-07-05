@@ -9,6 +9,7 @@ import users from './users'
 import auth from './auth'
 import docs from './docs'
 import keys from './keys'
+import notifications from './notifications'
 
 const router = Router()
 
@@ -18,10 +19,10 @@ router.use(bodyParser.urlencoded({
 }))
 router.use(cookieParser());
 
-// Add USERS Routes
 router.use('/auth', auth)
 router.use('/docs', docs)
 router.use('/keys', keys);
-router.use(users)
+router.use('/notifications', notifications)
+router.use('/users', users)
 
 export default router

@@ -10,7 +10,7 @@ import {
 
 const router = Router()
 
-router.get('/users', requireScope(["admin"]), function (req, res) {
+router.get('/', requireScope(["admin"]), function (req, res) {
   getUsers().then((users)=>{
     res.json(users);
   }).catch(err=>{
@@ -18,7 +18,7 @@ router.get('/users', requireScope(["admin"]), function (req, res) {
   })
 })
 
-router.get('/users/:id', requireScope(["admin"]), function (req, res) {
+router.get('/:id', requireScope(["admin"]), function (req, res) {
   getUser(req.params.id).then((users) => {
     res.json(users);
   }).catch(err => {
@@ -26,7 +26,7 @@ router.get('/users/:id', requireScope(["admin"]), function (req, res) {
   })
 })
 
-router.put('/users/:id', requireScope(["admin"]), function (req, res) {
+router.put('/:id', requireScope(["admin"]), function (req, res) {
   req.body.user.id = req.params.id
   updateUser(req.body.user).then(() => {
     res.sendStatus(200);
@@ -35,7 +35,7 @@ router.put('/users/:id', requireScope(["admin"]), function (req, res) {
   })
 })
 
-router.post('/register', requireScope(['admin']), (req, res) => {
+router.post('/', requireScope(['admin']), (req, res) => {
   const {
     first_name,
     last_name,

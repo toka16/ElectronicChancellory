@@ -97,6 +97,18 @@ export const updateUser = (user)=>{
     return query(`UPDATE Users SET first_name=?,last_name=?,email=?,password=? WHERE id=?`, [user.first_name, user.last_name, user.email,user.password, user.id])
 }
 
+export const saveNotification = (notification)=>{
+    return insert("Notifications", notification)
+}
+
+export const getNotifications = (id)=>{
+    return query("SELECT * from Notifications where target_id=?", id)
+}
+
+export const setNotificationSeen = (notificationId, userId)=>{
+    return query("UPDATE Notifications SET status=1 where id=? and target_id=?", [notificationId, userId])
+}
+
 function insert(table, item) {
     return query(`INSERT INTO ${table} SET ?`, item)
 }
