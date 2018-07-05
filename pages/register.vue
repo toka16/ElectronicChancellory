@@ -15,13 +15,8 @@
                             <v-text-field label="Enter user's password" v-model="password" @keypress="error=null" :append-icon="hidePassword ? 'visibility' : 'visibility_off'" :append-icon-cb="() => (hidePassword = !hidePassword)" :type="hidePassword ? 'password' : 'text'" :rules="passwordRules" :disabled="!!loading" required></v-text-field>
                             <v-text-field label="Enter user's first name" v-model="first_name" @keypress="error=null" :rules="requiredRules" :disabled="!!loading" required></v-text-field>
                             <v-text-field label="Enter user's last name" v-model="last_name" @keypress="error=null" :rules="requiredRules" :disabled="!!loading" required></v-text-field>
-                            <v-text-field label="Enter user's scope" v-model="scope" @keypress="error=null" :rules="requiredRules" :disabled="!!loading" required></v-text-field>
-                            <!-- <v-layout column>
-                                <v-layout justify-space-between> -->
+                            <v-select :items="scopeOptions" item-text="title" item-value="key" box v-model="scope"></v-select>
                             <v-btn :class=" { blue : valid, disabled: !valid }" type='submit' :loading="loading">Register</v-btn>
-                            <!-- <v-btn to="/register">Register</v-btn>
-                                </v-layout>
-                            </v-layout> -->
                         </v-form>
                     </div>
                 </v-card-text>
@@ -51,7 +46,17 @@ export default {
       first_name: "",
       requiredRules: [v => !!v || "This field is required"],
       last_name: "",
-      scope: ""
+      scope: "user",
+      scopeOptions: [{
+          title: "Operator",
+          key: "operator"
+      },{
+          title: "User",
+          key: "user"
+      },{
+          title: "Admin",
+          key: "admin"
+      }]
     };
   },
   methods: {
