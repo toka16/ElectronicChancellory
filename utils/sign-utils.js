@@ -2,7 +2,7 @@ import {
   call
 } from './worker-helper'
 
-const signatureAlgorithm = "SHA1withRSA";
+const signatureAlgorithm = "SHA512withRSA";
 
 export const sign = (key, data)=>{
   return call('signData', [signatureAlgorithm, key, data]);
