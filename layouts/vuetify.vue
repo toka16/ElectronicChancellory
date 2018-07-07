@@ -32,7 +32,7 @@
           </v-badge>
         </template>
         <template>
-          <v-list v-if="notifications.length>0">
+          <v-list v-if="notifications.length>0" style="max-height:400px">
             <v-list-tile v-for="item in notifications" :key="item.id" :to="item.link" @click="clearNotifications(item)">
               <v-list-tile-title :class="'black--text ' + (item.status||'info')">{{ item.text }}</v-list-tile-title>
             </v-list-tile>
@@ -46,7 +46,7 @@
     </v-toolbar>
     <v-content>
       <v-container>
-        <nuxt />
+        <nuxt ref="page" />
       </v-container>
     </v-content>
     <v-footer :fixed="false" app>
@@ -113,13 +113,18 @@ export default {
         this.$router.push("/login");
       });
     },
-    clearNotifications(item){
-      console.log(item)
-      this.$axios.put(`/api/notifications/${item.id}/seen`).then(()=>{
-        item.status = 1
-      }).catch(err=>{
-        console.log(err)
-      })
+    clearNotifications(item) {
+      this.$axios
+        .put(`/api/notifications/${item.id}/seen`)
+        .then(() => {
+          item.status = 1;
+          if (item.link === location.pathname) {
+            location.reload();
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   }
 };

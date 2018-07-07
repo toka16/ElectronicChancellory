@@ -23,7 +23,7 @@ module.exports = {
   */
   css: ['~/assets/css/main.css', '~/assets/style/app.styl'],
 
-  plugins: ['~/plugins/vuetify'],
+  plugins: ['~/plugins/vuetify', '~/plugins/notifications_pinger'],
 
   modules: [
     '@nuxtjs/axios',

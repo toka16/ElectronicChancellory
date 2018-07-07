@@ -18,7 +18,7 @@
     <div v-else>
       <v-alert :value="true" :type="signStatus">
         This document is signed by {{signer}} at {{new Date(document.signed_at).toLocaleString()}}
-        <v-btn @click="verify">Verify</v-btn>
+        <v-btn @click="verify" v-show="signStatus === 'info'">Verify</v-btn>
       </v-alert>
     </div>
     <v-divider />
@@ -101,7 +101,11 @@ export default {
           signature
         })
         .then(() => {
-          location.reload();
+          // location.reload();
+          this.document.signature = signature
+          this.document.signed_at = new Date()
+          this.document.signer_first_name = this.$auth.user.first_name
+          this.document.signer_last_name = this.$auth.user.last_name
         })
         .catch(res => {
           console.log(res)

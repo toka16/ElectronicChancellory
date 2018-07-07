@@ -69,11 +69,11 @@ export default {
 </script>
 
 <style>
-.error {
+/* .error {
   background-color: #ff5252 !important;
 }
 .info {
   background-color: #2196f3 !important;
   border-color: #2196f3 !important;
-}
+} */
 </style>
