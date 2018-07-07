@@ -3,6 +3,7 @@ import { Router } from 'express'
 import requireScope from '../requireScope'
 import {
   getUsers,
+  getByRole,
   getUser,
   saveUser,
   updateUser
@@ -14,6 +15,14 @@ router.get('/', requireScope(["admin"]), function (req, res) {
   getUsers().then((users)=>{
     res.json(users);
   }).catch(err=>{
+    res.status(500).send(err);
+  })
+})
+
+router.get('/operators', requireScope(["operator"]), (req, res)=>{
+  getByRole('operator').then(operators=>{
+    res.json(operators)
+  }).catch((err)=>{
     res.status(500).send(err);
   })
 })

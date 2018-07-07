@@ -13,7 +13,6 @@ export default (ctx)=>{
     const title = titles[ctx.route.name] || 'Electronic Chancellory'
     ctx.store.commit('setTitle', title);
 
-    console.log(ctx.route)
     for (let i=0; i<ctx.store.state.notifications.length; i++){
         if (ctx.store.state.notifications[i].link === ctx.route.fullPath){
             ctx.$axios.put(`/api/notifications/${ctx.store.state.notifications[i].id}/seen`).then(() => {

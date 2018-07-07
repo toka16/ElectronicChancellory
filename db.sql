@@ -1,3 +1,4 @@
+
 CREATE DATABASE IF NOT EXISTS el_chancellory;
 use el_chancellory;
 
@@ -21,10 +22,12 @@ CREATE TABLE `docs` (
   `text` longtext NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `title` varchar(256) NOT NULL,
+  `assigned_to_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `docs_author_id_ind` (`author_id`),
+  KEY `docs_ibfk_1_idx` (`assigned_to_id`),
   CONSTRAINT `docs_ibfk_1` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `rsa_keys` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -106,20 +109,24 @@ CREATE VIEW `docs_view` AS
     SELECT 
         `docs`.`id` AS `id`,
         `docs`.`author_id` AS `author_id`,
+        `docs`.`assigned_to_id` AS `assigned_to_id`,
         `docs`.`text` AS `text`,
         `docs`.`created_at` AS `created_at`,
         `docs`.`title` AS `title`,
         `author`.`first_name` AS `first_name`,
         `author`.`last_name` AS `last_name`,
+        `assignee`.`first_name` AS `assignee_first_name`,
+        `assignee`.`last_name` AS `assignee_last_name`,
         `sign`.`signature` AS `signature`,
         `sign`.`created_at` AS `signed_at`,
         `sign`.`user_id` AS `signer_id`,
         `sign`.`first_name` AS `signer_first_name`,
         `sign`.`last_name` AS `signer_last_name`
     FROM
-        ((`docs`
-        JOIN `users` `author` ON ((`author`.`id` = `docs`.`author_id`)))
-        LEFT JOIN `signatures_view` `sign` ON ((`sign`.`document_id` = `docs`.`id`)));
+        `docs`
+        JOIN `users` `author` ON `author`.`id` = `docs`.`author_id`
+        LEFT JOIN `users` `assignee` ON `assignee`.`id` = `docs`.`assigned_to_id`
+        LEFT JOIN `signatures_view` `sign` ON `sign`.`document_id` = `docs`.`id`;
 
 
   
@@ -238,6 +245,52 @@ DELIMITER ;
 
 
 DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `create_notifications_for_document_assignment`(in document_id int, in assignee_id int)
+BEGIN
+
+	DECLARE assignee_name varchar(256);
+    DECLARE document_title varchar(256);
+    DECLARE sub_id int;
+    
+    DECLARE tCount INT;
+    
+    DECLARE bDone INT;
+	DECLARE curs CURSOR FOR SELECT ds.subscriber_id FROM Document_Subscribers ds WHERE ds.document_id = document_id;
+    
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET bDone = 1;
+    
+    DROP TEMPORARY TABLE IF EXISTS tblResults;
+    CREATE TEMPORARY TABLE IF NOT EXISTS tblResults  (
+		auth_id int
+    );
+    
+    select concat(first_name, " ", last_name) into assignee_name from Users where id=assignee_id;
+    select title into document_title from Docs where id=document_id;
+
+	OPEN curs;
+
+	SET bDone = 0;
+	REPEAT
+	FETCH curs INTO sub_id;
+
+	IF sub_id <> assignee_id then
+		select count(*) into tCount from tblResults where auth_id=sub_id;
+        if tCount = 0 then
+			INSERT INTO Notifications (target_id, `text`, link, created_at) VALUES (sub_id, concat(document_title, ' was assigned to ', assignee_name), concat('/documents/', document_id), now());
+			INSERT INTO tblResults values (sub_id);
+        END if;
+    END IF;
+	UNTIL bDone END REPEAT;
+    INSERT INTO Notifications (target_id, `text`, link, created_at) VALUES (assignee_id, concat(document_title, ' was assigned to YOU'), concat('/documents/', document_id), now());
+
+	CLOSE curs;
+    DROP TEMPORARY TABLE IF EXISTS tblResults;
+
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `add_subscriber`(in document_id int, in author_id int)
 BEGIN
 	
@@ -251,7 +304,18 @@ BEGIN
 END$$
 DELIMITER ;
 
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `change_assignee`(in document_id int, in assignee_id int)
+BEGIN
+	
+    UPDATE Docs SET assigned_to_id=assignee_id where id=document_id;
+	call create_notifications_for_document_assignment(document_id, assignee_id);
 
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
 CREATE DEFINER=`root`@`localhost` TRIGGER after_comments_insert
 AFTER INSERT ON Comments
 FOR EACH ROW BEGIN
@@ -261,16 +325,22 @@ FOR EACH ROW BEGIN
     call create_notifications_for_new_comment(NEW.document_id, NEW.author_id);
     call add_subscriber(NEW.document_id, NEW.author_id);
     
-END
+END$$
+DELIMITER ;
 
+
+DELIMITER $$
 CREATE DEFINER=`root`@`localhost` TRIGGER after_documents_insert
 AFTER INSERT ON Docs
 FOR EACH ROW BEGIN
 
 	INSERT INTO Document_Subscribers (subscriber_id, document_id) values (NEW.author_id, NEW.id);
     
-END
+END$$
+DELIMITER ;
 
+
+DELIMITER $$
 CREATE DEFINER=`root`@`localhost` TRIGGER after_signature_insert
 AFTER INSERT ON Signatures
 FOR EACH ROW BEGIN
@@ -278,4 +348,5 @@ FOR EACH ROW BEGIN
 	call create_notifications_for_signature(NEW.document_id, NEW.user_id);
     call add_subscriber(NEW.document_id, NEW.user_id);
     
-END
+END$$
+DELIMITER ;

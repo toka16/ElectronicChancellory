@@ -1,6 +1,6 @@
 export default (ctx) => {
-
     function refreshNotifications() {
+        if (!ctx.store.$auth.loggedIn) return;
         ctx.$axios.$get("/api/notifications").then(notifications => {
             notifications.sort((a, b) => {
                 const aTime = new Date(a.created_at).getTime()

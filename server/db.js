@@ -61,6 +61,10 @@ export const signDoc = (signature) => {
     return insert('Signatures', signature);
 }
 
+export const changeAssigneeOfDoc = (docId, assigneeId)=>{
+    return query("CALL change_assignee(?, ?)", [docId, assigneeId])
+}
+
 export const saveKey = (key) => {
     return insert('RSA_Keys', key);
 }
@@ -79,6 +83,10 @@ export const saveComment = (comment) => {
 
 export const getUsers = ()=>{
     return query('SELECT * from Users');
+}
+
+export const getByRole = (role) => {
+    return query('SELECT * from Users where scope=?', role);
 }
 
 export const getUser = async (id) => {

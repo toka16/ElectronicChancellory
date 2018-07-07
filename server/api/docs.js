@@ -12,6 +12,7 @@ import {
     getUserDocs,
     getUserSignedDocs,
     getUnsignedDocs,
+    changeAssigneeOfDoc,
     getComments,
     saveComment
 } from '../db'
@@ -49,6 +50,14 @@ router.get('/:id', requireScope(["operator", "user"]), (req, res) => {
     getDoc(req.params.id).then(doc => {
         res.json(doc);
     }).catch(err => {
+        res.status(500).send(err);
+    })
+})
+
+router.put("/:id/assignee", requireScope(["operator", "user"]), (req, res)=>{
+    changeAssigneeOfDoc(req.params.id, req.body.id).then(()=>{
+        res.sendStatus(200);
+    }).catch(err=>{
         res.status(500).send(err);
     })
 })

@@ -4,7 +4,8 @@ const createStore = () => {
     return new Vuex.Store({
         state: {
             title: "",
-            notifications: []
+            notifications: [],
+            operators: []
         },
         mutations: {
             setTitle(state, title) {
@@ -15,6 +16,9 @@ const createStore = () => {
             },
             setNotificationStatus(state, i, status) {
                 state.notifications[i] ? state.notifications[i].status = status : null
+            },
+            setOperators(state, operators){
+                state.operators = operators
             }
         }
     })
