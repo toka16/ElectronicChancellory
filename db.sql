@@ -72,8 +72,13 @@ CREATE TABLE `document_subscribers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `document_id` int(11) NOT NULL,
   `subscriber_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `doc_subscribers_ibfk_1_idx` (`subscriber_id`),
+  KEY `doc_subscribers_ibfk_2_idx` (`document_id`),
+  CONSTRAINT `doc_subscribers_ibfk_1` FOREIGN KEY (`subscriber_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `doc_subscribers_ibfk_2` FOREIGN KEY (`document_id`) REFERENCES `docs` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+
 
 
 CREATE TABLE `notifications` (
