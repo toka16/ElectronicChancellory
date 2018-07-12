@@ -45,6 +45,10 @@ export const getAllDocs = () => {
     return query("SELECT * from docs_view");
 }
 
+export const getAssignedTo = (id)=>{
+    return query("SELECT * from docs_view where assigned_to_id = ?", id)
+}
+
 export const getUserDocs = (id) => {
     return query("SELECT * from docs_view where author_id = ?", id);
 }

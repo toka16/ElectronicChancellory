@@ -38,7 +38,7 @@
 export default {
   layout: "vuetify",
   async asyncData(ctx) {
-    const docs = await ctx.$axios.$get("/api/docs?group=signed-by-me");
+    const docs = await ctx.$axios.$get("/api/docs?group=assigned-to-me");
     for (let doc of docs) {
       doc.owner = `${doc.first_name} ${doc.last_name}`;
     }
@@ -57,9 +57,10 @@ export default {
   },
   data() {
     return {
-      docs: "signed-by-me",
+      docs: "assigned-to-me",
       docOptions: [
         { title: "All", key: "all" },
+        { title: "Assigned to me", key: "assigned-to-me" },
         { title: "Signed by me", key: "signed-by-me" },
         { title: "Unsigned", key: "unsigned" }
       ],

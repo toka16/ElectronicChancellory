@@ -22,7 +22,7 @@ CREATE TABLE `docs` (
   `text` longtext NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `title` varchar(256) NOT NULL,
-  `assigned_to_id` int(11) NOT NULL,
+  `assigned_to_id` int(11),
   PRIMARY KEY (`id`),
   KEY `docs_author_id_ind` (`author_id`),
   KEY `docs_ibfk_1_idx` (`assigned_to_id`),

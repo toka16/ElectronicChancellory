@@ -10,6 +10,7 @@ import {
     signDoc,
     getAllDocs,
     getUserDocs,
+    getAssignedTo,
     getUserSignedDocs,
     getUnsignedDocs,
     changeAssigneeOfDoc,
@@ -20,13 +21,16 @@ import {
 const router = Router()
 
 router.get('/', requireScope(["operator", "user"]), (req, res) => {
-    let group = req.query.group || "signed-by-me"
+    let group = req.query.group || "assigned-to-me"
     let docGetter
     switch (req.user.scope) {
         case "operator":
             switch (group) {
                 case "all":
                     docGetter = () => getAllDocs()
+                    break
+                case "assigned-to-me":
+                    docGetter = ()=> getAssignedTo(req.user.id)
                     break
                 case "signed-by-me":
                     docGetter = () => getUserSignedDocs(req.user.id)
